@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Babel - CDN</title>
+
+		<style>
+			#response {
+				width: 100%;
+				height: 200px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Weather API</h1>
+		<label for="pcode">Post Code</label>
+		<input id="pcode" type="text" value="10001"/>
+		<button id="getBtn">Get</button>
+		<br/>Location: <span id="loc"></span>
+		<br/>Temperature: <span id="temp"></span>
+		<h2>Response</h2>
+		<textarea id="response"></textarea>
+
+		<script src="cached-fetch.js"></script>
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<!-- Babel 227kb-->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+		<script type="text/babel">
+			console.log('start');
+
+			const getWeather = () => {
+				const weatherRequestUrl = 'http://api.openweathermap.org/data/2.5/weather?q=10001&units=metric&APPID=22ca3c5a56ff5516d3ba92ccc3240f64';
+
+//				fetch(weatherRequestUrl, {method: 'get'})
+				// cachedFetch(weatherRequestUrl, {method: 'get'})
+				cachedFetch(weatherRequestUrl, {method: 'get', seconds: 10})
+				.then((response) => {
+					console.log('Success');
+					return response.json();
+				})
+				.then((json) => {
+					console.log('json:',json);
+					$('#response').val(JSON.stringify(json, null, 2));
+					$('#loc').text(json.name);
+					$('#temp').text(json.main.temp);
+					window.json = json;
+				})
+				.catch((error) => 	{
+					console.log('Error');
+				});
+			};
+
+			$(() => {
+				console.log('ready');
+				$('#getBtn').on('click', () => {
+					getWeather();
+				});
+			});
+
+			console.log('done');
+		</script>
+	</body>
+</html>
